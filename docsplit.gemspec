@@ -1,7 +1,6 @@
 Gem::Specification.new do |s|
-  s.name      = 'docsplit'
-  s.version   = '0.7.4'         # Keep version in sync with docsplit.rb
-  s.date      = '2014-02-16'
+  s.name      = 'burisu-docsplit'
+  s.version   = '0.7.5'         # Keep version in sync with docsplit.rb
 
   s.homepage    = "http://documentcloud.github.com/docsplit/"
   s.summary     = "Break Apart Documents into Images, Text, Pages and PDFs"
@@ -14,7 +13,6 @@ Gem::Specification.new do |s|
 
   s.authors           = ['Jeremy Ashkenas', 'Samuel Clay', 'Ted Han']
   s.email             = 'opensource@documentcloud.org'
-  s.rubyforge_project = 'docsplit'
   s.license           = 'MIT'
 
   s.require_paths     = ['lib']
