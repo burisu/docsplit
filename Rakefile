@@ -1,10 +1,10 @@
 require "bundler/gem_tasks"
-
 require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
+
+desc 'Run all tests'
+task :test do
+  require 'minitest/autorun'
+  Dir['./test/*/**/test_*.rb'].each {|test| require test }
 end
 
 task :default => :test
