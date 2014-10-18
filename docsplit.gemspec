@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name      = 'burisu-docsplit'
-  s.version   = '0.7.6'         # Keep version in sync with docsplit.rb
+  s.version   = '0.7.7'         # Keep version in sync with docsplit.rb
   s.homepage    = "http://documentcloud.github.com/docsplit/"
   s.summary     = "Break Apart Documents into Images, Text, Pages and PDFs"
   s.description = <<-EOS
