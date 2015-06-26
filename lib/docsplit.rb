@@ -5,7 +5,7 @@ require 'shellwords'
 # The Docsplit module delegates to the Java PDF extractors.
 module Docsplit
 
-  VERSION       = '0.7.5' # Keep in sync with gemspec.
+  VERSION       = '0.7.6' # Keep in sync with gemspec.
 
   ESCAPE        = lambda {|x| Shellwords.shellescape(x) }
 
@@ -16,7 +16,7 @@ module Docsplit
   
   GM_FORMATS    = ["image/gif", "image/jpeg", "image/png", "image/x-ms-bmp", "image/svg+xml", "image/tiff", "image/x-portable-bitmap", "application/postscript", "image/x-portable-pixmap"]
 
-  DEPENDENCIES  = {:java => false, :gm => false, :pdftotext => false, :pdftk => false, :pdftailor => false, :tesseract => false}
+  DEPENDENCIES  = {:java => false, :gm => false, :pdftotext => false, :pdftk => false, :pdftailor => false, :tesseract => false, :osd => false}
 
   # Check for all dependencies, and note their absence.
   dirs = ENV['PATH'].split(File::PATH_SEPARATOR)
@@ -29,7 +29,14 @@ module Docsplit
     end
   end
 
-  # Raise an ExtractionFailed exception when the PDF is encrypted, or otherwise
+  # if tesseract is found check for the osd plugin so that we can do orientation independent OCR.
+  if DEPENDENCIES[:tesseract]
+    # osd will be listed in tesseract --listlangs
+    val = %x[ #{'tesseract --list-langs'} 2>&1 >/dev/null ]
+    DEPENDENCIES[:osd] = true if val =~ /\bosd\b/
+  end
+
+    # Raise an ExtractionFailed exception when the PDF is encrypted, or otherwise
   # broke.
   class ExtractionFailed < StandardError; end
 
