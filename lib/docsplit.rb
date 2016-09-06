@@ -1,11 +1,10 @@
 require 'tmpdir'
 require 'fileutils'
 require 'shellwords'
+require 'docsplit/version'
 
 # The Docsplit module delegates to the Java PDF extractors.
 module Docsplit
-  VERSION       = '0.7.6'.freeze # Keep in sync with gemspec.
-
   ESCAPE        = ->(x) { Shellwords.shellescape(x) }
 
   ROOT          = File.expand_path(File.dirname(__FILE__) + '/..')

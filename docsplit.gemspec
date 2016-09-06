@@ -1,6 +1,10 @@
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'docsplit/version'
+
 Gem::Specification.new do |s|
   s.name      = 'burisu-docsplit'
-  s.version   = '0.7.8' # Keep version in sync with docsplit.rb
+  s.version   = Docsplit::VERSION # Keep version in sync with docsplit.rb
   s.homepage    = 'http://documentcloud.github.com/docsplit/'
   s.summary     = 'Break Apart Documents into Images, Text, Pages and PDFs'
   s.description = <<-EOS
