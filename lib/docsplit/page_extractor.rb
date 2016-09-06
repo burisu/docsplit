@@ -17,7 +17,7 @@ module Docsplit
         end
         result = `#{cmd}`.chomp
         FileUtils.rm('doc_data.txt') if File.exist?('doc_data.txt')
-        raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
+        raise ExtractionFailed, result if $?.exitstatus.nonzero?
         result
       end
     end

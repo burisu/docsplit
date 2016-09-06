@@ -22,7 +22,7 @@ module Docsplit
       pdf = [pdfs].flatten.first
       cmd = "pdfinfo #{ESCAPE[pdf]} 2>&1"
       result = `#{cmd}`.chomp
-      raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
+      raise ExtractionFailed, result if $?.exitstatus.nonzero?
       # ruby  1.8 (iconv) and 1.9 (String#encode) :
       if String.method_defined?(:encode)
         result.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') unless result.valid_encoding?

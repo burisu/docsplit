@@ -136,7 +136,7 @@ module Docsplit
             options = "--headless --invisible  --norestore --nolockcheck --convert-to pdf --outdir #{escaped_out} #{escaped_doc}"
             cmd = "#{office_executable} #{options} 2>&1"
             result = `#{cmd}`.chomp
-            raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
+            raise ExtractionFailed, result if $?.exitstatus.nonzero?
             true
           else # open office presumably, rely on JODConverter to figure it out.
             options = "-jar #{ESCAPED_ROOT}/vendor/jodconverter/jodconverter-core-3.0-beta-4.jar -r #{ESCAPED_ROOT}/vendor/conf/document-formats.js"
@@ -160,7 +160,7 @@ module Docsplit
       office = osx? ? "-Doffice.home=#{office_path}" : office_path
       cmd    = "java #{HEADLESS} #{LOGGING} #{office} -cp #{CLASSPATH} #{command} #{pdfs} 2>&1"
       result = `#{cmd}`.chomp
-      raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
+      raise ExtractionFailed, result if $?.exitstatus.nonzero?
       return_output ? (result.empty? ? nil : result) : true
     end
 

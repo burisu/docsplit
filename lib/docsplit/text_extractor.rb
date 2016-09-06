@@ -95,7 +95,7 @@ module Docsplit
     # Run an external process and raise an exception if it fails.
     def run(command)
       result = `#{command}`
-      raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
+      raise ExtractionFailed, result if $?.exitstatus.nonzero?
       result
     end
 
