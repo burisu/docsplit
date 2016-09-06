@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name      = 'burisu-docsplit'
-  s.version   = '0.7.8'         # Keep version in sync with docsplit.rb
-  s.homepage    = "http://documentcloud.github.com/docsplit/"
-  s.summary     = "Break Apart Documents into Images, Text, Pages and PDFs"
+  s.version   = '0.7.8' # Keep version in sync with docsplit.rb
+  s.homepage    = 'http://documentcloud.github.com/docsplit/'
+  s.summary     = 'Break Apart Documents into Images, Text, Pages and PDFs'
   s.description = <<-EOS
     Docsplit is a command-line utility and Ruby library for splitting apart
     documents into their component parts: searchable UTF-8 plain text, page

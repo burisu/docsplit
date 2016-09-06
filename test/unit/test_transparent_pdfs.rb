@@ -3,7 +3,6 @@ require File.join(here, '..', 'test_helper')
 require 'tmpdir'
 
 class TransparentPDFsTest < Minitest::Test
-
   def setup
     @klass = Class.new
     @klass.send(:include, Docsplit::TransparentPDFs)
@@ -25,5 +24,4 @@ class TransparentPDFsTest < Minitest::Test
       assert @detector.is_pdf?(pdf), "#{pdf} with '.pdf' extension is identified as a PDF"
     end
   end
-
 end

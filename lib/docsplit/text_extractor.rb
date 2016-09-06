@@ -1,5 +1,4 @@
 module Docsplit
-
   # Delegates to **pdftotext** and **tesseract** in order to extract text from
   # PDF documents. The `--ocr` and `--no-ocr` flags can be used to force or
   # forbid OCR extraction, but by default the heuristic works like this:
@@ -13,11 +12,10 @@ module Docsplit
   #  * Re-OCR each page in the `@pages_to_ocr` list at the end.
   #
   class TextExtractor
-
     NO_TEXT_DETECTED = /---------\n\Z/
 
-    OCR_FLAGS   = '-density 400x400 -colorspace GRAY'
-    MEMORY_ARGS = '-limit memory 256MiB -limit map 512MiB'
+    OCR_FLAGS   = '-density 400x400 -colorspace GRAY'.freeze
+    MEMORY_ARGS = '-limit memory 256MiB -limit map 512MiB'.freeze
 
     MIN_TEXT_PER_PAGE = 100 # in bytes
 
@@ -28,10 +26,10 @@ module Docsplit
     # Extract text from a list of PDFs.
     def extract(pdfs, opts)
       extract_options opts
-      FileUtils.mkdir_p @output unless File.exists?(@output)
+      FileUtils.mkdir_p @output unless File.exist?(@output)
       [pdfs].flatten.each do |pdf|
         @pdf_name = File.basename(pdf, File.extname(pdf))
-        pages = (@pages == 'all') ? 1..Docsplit.extract_length(pdf) : @pages
+        pages = @pages == 'all' ? 1..Docsplit.extract_length(pdf) : @pages
         if @force_ocr || (!@forbid_ocr && !contains_text?(pdf))
           extract_from_ocr(pdf, pages)
         else
@@ -52,7 +50,7 @@ module Docsplit
     # Extract a page range worth of text from a PDF, directly.
     def extract_from_pdf(pdf, pages)
       return extract_full(pdf) unless pages
-      pages.each {|page| extract_page(pdf, page) }
+      pages.each { |page| extract_page(pdf, page) }
     end
 
     # Extract a page range worth of text from a PDF via OCR.
@@ -60,7 +58,7 @@ module Docsplit
       tempdir = Dir.mktmpdir
       base_path = File.join(@output, @pdf_name)
       escaped_pdf = ESCAPE[pdf]
-      psm = @detect_orientation ? "-psm 1" : ""
+      psm = @detect_orientation ? '-psm 1' : ''
       if pages
         pages.each do |page|
           tiff = "#{tempdir}/#{@pdf_name}_#{page}.tif"
@@ -75,14 +73,13 @@ module Docsplit
         tiff = "#{tempdir}/#{@pdf_name}.tif"
         escaped_tiff = ESCAPE[tiff]
         run "MAGICK_TMPDIR=#{tempdir} OMP_NUM_THREADS=2 gm convert -despeckle #{MEMORY_ARGS} #{OCR_FLAGS} #{escaped_pdf} #{escaped_tiff} 2>&1"
-        #if the user says don't do orientation detection or the plugin is not installed, set psm to 0
+        # if the user says don't do orientation detection or the plugin is not installed, set psm to 0
         run "tesseract #{escaped_tiff} #{base_path} -l #{@language} #{psm} 2>&1"
         clean_text(base_path + '.txt') if @clean_ocr
       end
     ensure
-      FileUtils.remove_entry_secure tempdir if File.exists?(tempdir)
+      FileUtils.remove_entry_secure tempdir if File.exist?(tempdir)
     end
-
 
     private
 
@@ -98,7 +95,7 @@ module Docsplit
     # Run an external process and raise an exception if it fails.
     def run(command)
       result = `#{command}`
-      raise ExtractionFailed, result if $? != 0
+      raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
       result
     end
 
@@ -124,10 +121,8 @@ module Docsplit
       @force_ocr          = options[:ocr] == true
       @forbid_ocr         = options[:ocr] == false
       @language           = options[:language] || 'eng'
-      @clean_ocr          = (!(options[:clean] == false) and @language == 'eng')
-      @detect_orientation = ((options[:detect_orientation] != false) and DEPENDENCIES[:osd])
+      @clean_ocr          = (!(options[:clean] == false) && @language == 'eng')
+      @detect_orientation = ((options[:detect_orientation] != false) && DEPENDENCIES[:osd])
     end
-
   end
-
 end

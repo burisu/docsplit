@@ -1,12 +1,10 @@
 module Docsplit
-
   # Delegates to GraphicsMagick in order to convert PDF documents into
   # nicely sized images.
   class ImageExtractor
-
-    MEMORY_ARGS     = "-limit memory 256MiB -limit map 512MiB"
+    MEMORY_ARGS     = '-limit memory 256MiB -limit map 512MiB'.freeze
     DEFAULT_FORMAT  = :png
-    DEFAULT_DENSITY = '150'
+    DEFAULT_DENSITY = '150'.freeze
 
     # Extract a list of PDFs as rasterized page images, according to the
     # configuration in options.
@@ -15,8 +13,8 @@ module Docsplit
       extract_options(options)
       @pdfs.each do |pdf|
         previous = nil
-        @sizes.each_with_index do |size, i|
-          @formats.each {|format| convert(pdf, size, format, previous) }
+        @sizes.each_with_index do |size, _i|
+          @formats.each { |format| convert(pdf, size, format, previous) }
           previous = size if @rolling
         end
       end
@@ -27,36 +25,35 @@ module Docsplit
     # we simply downsample that image, instead of re-rendering the entire PDF.
     # Now we generate one page at a time, a counterintuitive opimization
     # suggested by the GraphicsMagick list, that seems to work quite well.
-    def convert(pdf, size, format, previous=nil)
+    def convert(pdf, size, format, previous = nil)
       tempdir   = Dir.mktmpdir
       basename  = File.basename(pdf, File.extname(pdf))
       directory = directory_for(size)
       pages     = @pages || '1-' + Docsplit.extract_length(pdf).to_s
       escaped_pdf = ESCAPE[pdf]
-      FileUtils.mkdir_p(directory) unless File.exists?(directory)
-      common    = "#{MEMORY_ARGS} -density #{@density} #{resize_arg(size)} #{quality_arg(format)}"
+      FileUtils.mkdir_p(directory) unless File.exist?(directory)
+      common = "#{MEMORY_ARGS} -density #{@density} #{resize_arg(size)} #{quality_arg(format)}"
       if previous
         FileUtils.cp(Dir[directory_for(previous) + '/*'], directory)
         result = `MAGICK_TMPDIR=#{tempdir} OMP_NUM_THREADS=2 gm mogrify #{common} -unsharp 0x0.5+0.75 \"#{directory}/*.#{format}\" 2>&1`.chomp
-        raise ExtractionFailed, result if $? != 0
+        raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
       else
         page_list(pages).each do |page|
-          out_file  = ESCAPE[File.join(directory, "#{basename}_#{page}.#{format}")]
+          out_file = ESCAPE[File.join(directory, "#{basename}_#{page}.#{format}")]
           cmd = "MAGICK_TMPDIR=#{tempdir} OMP_NUM_THREADS=2 gm convert +adjoin -define pdf:use-cropbox=true #{common} #{escaped_pdf}[#{page - 1}] #{out_file} 2>&1".chomp
           result = `#{cmd}`.chomp
-          raise ExtractionFailed, result if $? != 0
+          raise ExtractionFailed, result if $CHILD_STATUS.nonzero?
         end
       end
     ensure
-      FileUtils.remove_entry_secure tempdir if File.exists?(tempdir)
+      FileUtils.remove_entry_secure tempdir if File.exist?(tempdir)
     end
-
 
     private
 
     # Extract the relevant GraphicsMagick options from the options hash.
     def extract_options(options)
-      @output  = options[:output]  || '.'
+      @output  = options[:output] || '.'
       @pages   = options[:pages]
       @density = options[:density] || DEFAULT_DENSITY
       @formats = [options[:format] || DEFAULT_FORMAT].flatten
@@ -80,24 +77,22 @@ module Docsplit
     # Generate the appropriate quality argument for the image format.
     def quality_arg(format)
       case format.to_s
-      when /jpe?g/ then "-quality 85"
-      when /png/   then "-quality 100"
-      else ""
+      when /jpe?g/ then '-quality 85'
+      when /png/   then '-quality 100'
+      else ''
       end
     end
 
     # Generate the expanded list of requested page numbers.
     def page_list(pages)
-      pages.split(',').map { |range|
+      pages.split(',').map do |range|
         if range.include?('-')
           range = range.split('-')
-          Range.new(range.first.to_i, range.last.to_i).to_a.map {|n| n.to_i }
+          Range.new(range.first.to_i, range.last.to_i).to_a.map(&:to_i)
         else
           range.to_i
         end
-      }.flatten.uniq.sort
+      end.flatten.uniq.sort
     end
-
   end
-
 end
